@@ -6,12 +6,12 @@
 
 Flag risky database query plans from explain-plan notes. It solves review drift by turning plain-text plans into deterministic CI-friendly findings.
 
-## Input Contract 9
+## Input Contract
 
 Accepts query plan notes. The reader supports plain text, JSON, JSONL, and CSV so the
 tool can fit into scripts, CI jobs, and review exports.
 
-## CLI Walkthrough 9
+## CLI Walkthrough
 
 ```bash
 python -m pip install -e ".[dev]"
@@ -20,7 +20,7 @@ query-plan-risk examples/sample.txt --json --fail-on medium
 python -m query_plan_risk --help
 ```
 
-## Rule Surface 9
+## Rule Surface
 
 | Rule | Severity | Meaning |
 |---|---:|---|
@@ -28,7 +28,7 @@ python -m query_plan_risk --help
 | `disk-sort` | medium | disk sort detected |
 | `huge-loop` | low | large nested loop detected |
 
-## Validation Notes 9
+## Validation Notes
 
 ```bash
 ruff check .
