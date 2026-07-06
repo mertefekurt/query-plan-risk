@@ -1,48 +1,45 @@
-# query-plan-risk
+# Query Plan Risk
 
-> Flag risky database query plans from explain-plan notes.
+![Query Plan Risk cover](assets/readme-cover.svg)
 
-## Field memo Overview
+> Flag risky database query plans from explain-plan notes
 
-Flag risky database query plans from explain-plan notes. It solves review drift by turning plain-text plans into deterministic CI-friendly findings.
+![stack](https://img.shields.io/badge/stack-Python-b45309?style=flat-square) ![python](https://img.shields.io/badge/python-3.11-be185d?style=flat-square) ![license](https://img.shields.io/badge/license-MIT-4b5563?style=flat-square) ![ci](https://img.shields.io/badge/ci-GitHub%20Actions-2563eb?style=flat-square)
 
-## Input Contract
+## At a glance
 
-Accepts query plan notes. The reader supports plain text, JSON, JSONL, and CSV so the
-tool can fit into scripts, CI jobs, and review exports.
+| Area | Detail |
+| --- | --- |
+| Focus | database review |
+| Command | `query-plan-risk` |
+| Formats | text, JSON, JSONL, CSV |
+| Output | Markdown table or JSON |
 
-## CLI Walkthrough
+## What it checks
+
+| Rule | Severity | What it catches |
+| --- | --- | --- |
+| `seq-scan` | high | sequential scan detected |
+| `disk-sort` | medium | disk sort detected |
+| `huge-loop` | low | large nested loop detected |
+
+## Try it locally
 
 ```bash
 python -m pip install -e ".[dev]"
 query-plan-risk examples/sample.txt
 query-plan-risk examples/sample.txt --json --fail-on medium
-python -m query_plan_risk --help
 ```
 
-## Rule Surface
+## Notes from the code
 
-| Rule | Severity | Meaning |
-|---|---:|---|
-| `seq-scan` | high | sequential scan detected |
-| `disk-sort` | medium | disk sort detected |
-| `huge-loop` | low | large nested loop detected |
+`rules.py` keeps the project policy explicit, while `core.py` handles parsing and report rendering. The CLI stays thin on purpose so the checks are easy to test.
 
-## Validation Notes
+## Verify
 
 ```bash
+python -m pip install -e ".[dev]"
 ruff check .
 pytest
 python -m query_plan_risk --help
 ```
-
-Example risky input:
-
-```text
-nested_loop huge sort disk seq_scan true
-```
-
-Architecture: `cli.py` handles arguments, `core.py` reads and evaluates records, and
-`rules.py` keeps the project-specific policy explicit.
-
-License: MIT.
