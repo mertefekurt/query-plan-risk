@@ -1,44 +1,36 @@
 # Query Plan Risk
 
+> A small command-line review pass for database review.
+
 ![Query Plan Risk cover](assets/readme-cover.svg)
 
-> Flag risky database query plans from explain-plan notes
+Flag risky database query plans from explain-plan notes. The repository is intentionally plain: a small command, a visible rule surface, and enough examples to make the behavior inspectable.
 
-![stack](https://img.shields.io/badge/stack-Python-b45309?style=flat-square) ![python](https://img.shields.io/badge/python-3.11-be185d?style=flat-square) ![license](https://img.shields.io/badge/license-MIT-4b5563?style=flat-square) ![ci](https://img.shields.io/badge/ci-GitHub%20Actions-2563eb?style=flat-square)
+## Signals in plain English
 
-## At a glance
+- `seq-scan` (high): sequential scan detected. Fix: review indexes and predicates.
+- `disk-sort` (medium): disk sort detected. Fix: add index or raise work memory intentionally.
+- `huge-loop` (low): large nested loop detected. Fix: check join order and cardinality.
 
-| Area | Detail |
-| --- | --- |
-| Focus | database review |
-| Command | `query-plan-risk` |
-| Formats | text, JSON, JSONL, CSV |
-| Output | Markdown table or JSON |
+## Input and report
 
-## What it checks
+The reader accepts text, JSON, JSONL, or CSV. The default report is readable in a terminal or pull request; `--json` keeps the same findings available to automation.
 
-| Rule | Severity | What it catches |
-| --- | --- | --- |
-| `seq-scan` | high | sequential scan detected |
-| `disk-sort` | medium | disk sort detected |
-| `huge-loop` | low | large nested loop detected |
-
-## Try it locally
+## Demo
 
 ```bash
+git clone https://github.com/mertefekurt/query-plan-risk.git
+cd query-plan-risk
+python -m venv .venv
+source .venv/bin/activate
 python -m pip install -e ".[dev]"
 query-plan-risk examples/sample.txt
-query-plan-risk examples/sample.txt --json --fail-on medium
+query-plan-risk examples/sample.txt --json
 ```
 
-## Notes from the code
-
-`rules.py` keeps the project policy explicit, while `core.py` handles parsing and report rendering. The CLI stays thin on purpose so the checks are easy to test.
-
-## Verify
+## Sanity checks
 
 ```bash
-python -m pip install -e ".[dev]"
 ruff check .
 pytest
 python -m query_plan_risk --help
