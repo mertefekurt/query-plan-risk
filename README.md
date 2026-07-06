@@ -1,37 +1,30 @@
 # Query Plan Risk
 
-> A small command-line review pass for database review.
+Flag risky database query plans from explain-plan notes.
 
 ![Query Plan Risk cover](assets/readme-cover.svg)
 
-Flag risky database query plans from explain-plan notes. The repository is intentionally plain: a small command, a visible rule surface, and enough examples to make the behavior inspectable.
+## Finding map
 
-## Signals in plain English
+![Workflow diagram](assets/readme-diagram.svg)
 
-- `seq-scan` (high): sequential scan detected. Fix: review indexes and predicates.
-- `disk-sort` (medium): disk sort detected. Fix: add index or raise work memory intentionally.
-- `huge-loop` (low): large nested loop detected. Fix: check join order and cardinality.
+## What it protects
 
-## Input and report
+- Targets database review instead of broad linting.
+- Accepts plain text and returns terminal findings, optional json.
+- Keeps each rule visible so the project can be tuned without hunting through prose.
 
-The reader accepts text, JSON, JSONL, or CSV. The default report is readable in a terminal or pull request; `--json` keeps the same findings available to automation.
+## Signals
 
-## Demo
+- `seq-scan` - sequential scan detected (high); review indexes and predicates.
+- `disk-sort` - disk sort detected (medium); add index or raise work memory intentionally.
+- `huge-loop` - large nested loop detected (low); check join order and cardinality.
+
+## Command path
 
 ```bash
 git clone https://github.com/mertefekurt/query-plan-risk.git
 cd query-plan-risk
-python -m venv .venv
-source .venv/bin/activate
 python -m pip install -e ".[dev]"
 query-plan-risk examples/sample.txt
-query-plan-risk examples/sample.txt --json
-```
-
-## Sanity checks
-
-```bash
-ruff check .
-pytest
-python -m query_plan_risk --help
 ```
